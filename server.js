@@ -1,29 +1,21 @@
 const express = require('express');
 const path = require('path');
-const mysql = require('mysql');
+const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// MySQL Connection
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'trt_users'
-});
-
-db.connect((err) => {
-  if (err) {
-    console.error('❌ MySQL connection failed:', err);
-  } else {
-    console.log('✅ Connected to MySQL');
+// PostgreSQL Pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false // Required for Render
   }
 });
 
@@ -49,31 +41,21 @@ app.post('/signup', async (req, res) => {
   const { firstname, surname, phone, username, email, password, language } = req.body;
 
   try {
-    const checkQuery = 'SELECT * FROM users WHERE email = ? OR username = ?';
-    db.query(checkQuery, [email, username], async (err, results) => {
-      if (err) {
-        console.error('❌ Error checking user:', err);
-        return res.status(500).json({ success: false, message: 'Server error.' });
-      }
+    const checkQuery = 'SELECT * FROM users WHERE email = $1 OR username = $2';
+    const checkResult = await pool.query(checkQuery, [email, username]);
 
-      if (results.length > 0) {
-        return res.status(409).json({ success: false, message: 'User already exists.' });
-      }
+    if (checkResult.rows.length > 0) {
+      return res.status(409).json({ success: false, message: 'User already exists.' });
+    }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const insertQuery = `
-        INSERT INTO users (firstname, surname, phone, username, email, password, language)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `;
-      db.query(insertQuery, [firstname, surname, phone, username, email, hashedPassword, language], (err) => {
-        if (err) {
-          console.error('❌ Error inserting user:', err);
-          return res.status(500).json({ success: false, message: 'Error creating account.' });
-        }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const insertQuery = `
+      INSERT INTO users (firstname, surname, phone, username, email, password, language)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `;
+    await pool.query(insertQuery, [firstname, surname, phone, username, email, hashedPassword, language]);
 
-        return res.status(200).json({ success: true, message: 'Signup successful!' });
-      });
-    });
+    return res.status(200).json({ success: true, message: 'Signup successful!' });
   } catch (error) {
     console.error('❌ Signup error:', error);
     return res.status(500).json({ success: false, message: 'Internal server error.' });
@@ -81,43 +63,40 @@ app.post('/signup', async (req, res) => {
 });
 
 // Login Route
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  const sql = 'SELECT * FROM users WHERE email = ?';
-  db.query(sql, [email], async (err, results) => {
-    if (err) {
-      console.error('❌ Login error:', err);
-      return res.status(500).send('Server error.');
-    }
+  try {
+    const sql = 'SELECT * FROM users WHERE email = $1';
+    const result = await pool.query(sql, [email]);
 
-    if (results.length === 0) {
+    if (result.rows.length === 0) {
       return res.status(401).send('⚠️ User not found.');
     }
 
-    const user = results[0];
+    const user = result.rows[0];
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(401).send('❌ Incorrect password.');
     }
 
-    // Redirect to dashboard
     res.redirect('/dashboard');
-  });
+  } catch (err) {
+    console.error('❌ Login error:', err);
+    return res.status(500).send('Server error.');
+  }
 });
 
 // Public API route for courses
-app.get('/api/courses', (req, res) => {
-  const sql = 'SELECT * FROM courses';
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error('❌ Error fetching courses:', err);
-      return res.status(500).send('Server error.');
-    }
-
-    res.json(results);
-  });
+app.get('/api/courses', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM courses');
+    res.json(result.rows);
+  } catch (err) {
+    console.error('❌ Error fetching courses:', err);
+    return res.status(500).send('Server error.');
+  }
 });
 
 // Start the server

@@ -1,0 +1,237 @@
+/* Reset some defaults */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Background Image */
+  body {
+    background-image: url('/images/background.jpg'); /* Ensure this image exists in public/images */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #fff;
+    min-height: 100vh;
+  }
+  
+  /* Overlay to darken background */
+  .overlay {
+    background-color: rgba(0, 0, 0, 0.6);
+    min-height: 100vh;
+    padding: 0 20px;
+  }
+  
+  /* Container layout */
+  .container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+  }
+  
+  /* Navigation bar */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+  }
+  
+  .logo {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #e9e4ff;
+  }
+  
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-links li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .nav-links li a:hover {
+    color: #081d64;
+  }
+  
+  /* Hero Section */
+  .hero {
+    text-align: center;
+    margin-top: 100px;
+  }
+  
+  .hero h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+  }
+  
+  .hero p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+  }
+  
+  .cta {
+    background-color: #2e1ae1;
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  
+  .cta:hover {
+    background-color: #1515da;
+  }
+  
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 50px;
+    font-size: 0.9rem;
+    color: #ccc;
+  } 
+/* Courses Section */
+.courses {
+    padding: 60px 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    margin-top: 40px;
+    text-align: center;
+  }
+  
+  .courses h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 40px;
+  }
+  
+  .course-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+  }
+  
+  .course-card {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+  }
+  
+  .course-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .course-card h3 {
+    font-size: 1.2rem;
+    color: #0077cc;
+    margin-bottom: 10px;
+  }
+  
+  .course-card p {
+    font-size: 0.95rem;
+    color: #444;
+  }
+/* Courses Section */
+.courses {
+    padding: 60px 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    margin-top: 40px;
+    text-align: center;
+  }
+  
+  .courses h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 40px;
+  }
+  
+  .course-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+  }
+  
+  .course-card {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+  }
+  
+  .course-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .course-card h3 {
+    font-size: 1.2rem;
+    color: #0077cc;
+    margin-bottom: 10px;
+  }
+  
+  .course-card p {
+    font-size: 0.95rem;
+    color: #444;
+  }/* Courses Section */
+.courses {
+    padding: 60px 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    margin-top: 40px;
+    text-align: center;
+  }
+  
+  .courses h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 40px;
+  }
+  
+  .course-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+  }
+  
+  .course-card {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+  }
+  
+  .course-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .course-card h3 {
+    font-size: 1.2rem;
+    color: #0077cc;
+    margin-bottom: 10px;
+  }
+  
+  .course-card p {
+    font-size: 0.95rem;
+    color: #444;
+  } 
+  body.dashboard-bg {
+    background-image: url('/images/dashboard-bg.jpg'); /* Replace with your file name */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+  }  
+    

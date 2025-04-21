@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sign Up | TRT Academy</title>
-  <link rel="stylesheet" href="/styles/signup.css">
+  <link rel="stylesheet" href="styles/signup.css">
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -17,7 +17,7 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background: url('/images/signup-bg.jpg') no-repeat center center/cover;
+      background: url('images/signup-bg.jpg') no-repeat center center/cover;
     }
 
     .overlay {
@@ -146,7 +146,7 @@
 
       <p>
         Already have an account?
-        <a href="/login" class="login-link">Log in</a>
+        <a href="login.html" class="login-link">Log in</a>
       </p>
     </div>
   </div>
@@ -220,23 +220,8 @@
         return;
       }
 
-      try {
-        const res = await fetch('/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-
-        const result = await res.json();
-
-        if (result.success) {
-          window.location.href = "/dashboard";
-        } else {
-          errorBox.textContent = result.message || "Signup failed.";
-        }
-      } catch (error) {
-        errorBox.textContent = "Server error. Please try again.";
-      }
+      // Dummy success message since GitHub Pages has no backend
+      alert("Signup successful (demo only). Thank you!");
     });
   </script>
 </body>

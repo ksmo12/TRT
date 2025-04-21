@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
+require('dotenv').config(); // Enable .env support
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,11 +12,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// PostgreSQL Pool
+// PostgreSQL Pool (Render setup)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false // Required for Render
+    rejectUnauthorized: false // Required for Render PostgreSQL
   }
 });
 
@@ -99,7 +100,12 @@ app.get('/api/courses', async (req, res) => {
   }
 });
 
+// Optional: Catch-all route (404)
+app.use((req, res) => {
+  res.status(404).send('Page not found.');
+});
+
 // Start the server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`🚀 Server is live on port ${PORT}`);
 });

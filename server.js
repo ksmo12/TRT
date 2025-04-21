@@ -29,19 +29,19 @@ db.connect((err) => {
 
 // Routes to serve HTML files
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'welcome.html'));
+  res.sendFile(path.join(__dirname, 'welcome.html'));
 });
 
 app.get('/signup', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'signup.html'));
+  res.sendFile(path.join(__dirname, 'signup.html'));
 });
 
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'login.html'));
+  res.sendFile(path.join(__dirname, 'login.html'));
 });
 
 app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
+  res.sendFile(path.join(__dirname, 'dashboard.html'));
 });
 
 // Signup Route

@@ -14,18 +14,18 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
+      padding: 40px 20px;
       margin: 0;
     }
 
     h1 {
       font-size: 2.5rem;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     p {
       font-size: 1.2rem;
+      margin-bottom: 30px;
     }
 
     a {
@@ -38,6 +38,45 @@
     a:hover {
       text-decoration: underline;
     }
+
+    #courses {
+      width: 100%;
+      max-width: 600px;
+      margin-top: 30px;
+    }
+
+    .course {
+      background: #fff;
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-left: 5px solid #0066cc;
+    }
+
+    .course h3 {
+      margin: 0 0 8px;
+    }
+
+    .course p {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+    }
+
+    .apply-btn {
+      display: inline-block;
+      padding: 8px 16px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .apply-btn:hover {
+      background-color: #0055aa;
+    }
   </style>
 </head>
 <body>
@@ -48,6 +87,44 @@
       or
       <a href="/signup">Sign Up</a>
     </p>
+
+    <section id="courses">
+      <h2>Available Courses</h2>
+      <div id="course-list">Loading courses...</div>
+    </section>
   </main>
+
+  <script>
+    async function fetchCourses() {
+      try {
+        const res = await fetch('/api/courses');
+        const courses = await res.json();
+
+        const courseList = document.getElementById('course-list');
+        courseList.innerHTML = '';
+
+        if (courses.length === 0) {
+          courseList.innerHTML = '<p>No courses available.</p>';
+          return;
+        }
+
+        courses.forEach(course => {
+          const div = document.createElement('div');
+          div.className = 'course';
+          div.innerHTML = `
+            <h3>${course.title}</h3>
+            <p>${course.description || 'No description available.'}</p>
+            <a class="apply-btn" href="/signup">Apply Now</a>
+          `;
+          courseList.appendChild(div);
+        });
+      } catch (err) {
+        console.error('Error loading courses:', err);
+        document.getElementById('course-list').innerHTML = '<p>Failed to load courses.</p>';
+      }
+    }
+
+    fetchCourses();
+  </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { Pool } = require('pg');
+const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 
@@ -12,10 +12,21 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// PostgreSQL connection
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+// MySQL connection
+const db = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT || 3306
+});
+
+db.connect((err) => {
+  if (err) {
+    console.error('❌ MySQL connection error:', err);
+    return;
+  }
+  console.log('✅ Connected to MySQL database');
 });
 
 // Serve HTML pages from public folder
@@ -37,19 +48,20 @@ app.post('/signup', async (req, res) => {
   const { firstname, surname, phone, username, email, password, language } = req.body;
 
   try {
-    const checkUser = await pool.query(
-      'SELECT * FROM users WHERE email = $1 OR username = $2',
+    const [existingUsers] = await db.promise().query(
+      'SELECT * FROM users WHERE email = ? OR username = ?',
       [email, username]
     );
 
-    if (checkUser.rows.length > 0) {
+    if (existingUsers.length > 0) {
       return res.status(409).json({ success: false, message: 'User already exists.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await pool.query(
+
+    await db.promise().query(
       `INSERT INTO users (firstname, surname, phone, username, email, password, language)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [firstname, surname, phone, username, email, hashedPassword, language]
     );
 
@@ -65,13 +77,16 @@ app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const [rows] = await db.promise().query(
+      'SELECT * FROM users WHERE email = ?',
+      [email]
+    );
 
-    if (result.rows.length === 0) {
+    if (rows.length === 0) {
       return res.redirect('/login?error=invalid');
     }
 
-    const user = result.rows[0];
+    const user = rows[0];
     const match = await bcrypt.compare(password, user.password);
 
     if (!match) {
@@ -89,8 +104,8 @@ app.post('/login', async (req, res) => {
 // Courses API route
 app.get('/api/courses', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM courses');
-    res.json(result.rows);
+    const [rows] = await db.promise().query('SELECT * FROM courses');
+    res.json(rows);
   } catch (err) {
     console.error('❌ Error fetching courses:', err);
     res.status(500).send('Server error.');

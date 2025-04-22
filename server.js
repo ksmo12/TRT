@@ -14,10 +14,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // MySQL connection
 const db = mysql.createConnection({
-  host: process.env.DB_HOST,       // e.g., sql3.freesqldatabase.com
-  user: process.env.DB_USER,       // your DB username
-  password: process.env.DB_PASSWORD, // your DB password
-  database: process.env.DB_NAME,   // your DB name
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   port: process.env.DB_PORT || 3306
 });
 

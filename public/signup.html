@@ -17,7 +17,7 @@
     <div class="signup-container">
       <h1 id="form-title">Create Your Account</h1>
 
-      <form id="signup-form">
+      <form id="signup-form" novalidate>
         <input type="text" name="firstname" placeholder="First Name" required />
         <input type="text" name="surname" placeholder="Surname" required />
         <input type="text" name="username" placeholder="Username" required />
@@ -33,14 +33,14 @@
           <option value="de">German</option>
         </select>
 
-        <div id="error-message"></div>
+        <div id="error-message" style="color: red; margin-top: 10px;"></div>
         <button type="submit" id="submit-button">Sign Up</button>
       </form>
 
       <div class="social-buttons">
-        <i class="fab fa-google"></i>
-        <i class="fab fa-apple"></i>
-        <i class="fab fa-facebook-f"></i>
+        <i class="fab fa-google" title="Sign up with Google"></i>
+        <i class="fab fa-apple" title="Sign up with Apple"></i>
+        <i class="fab fa-facebook-f" title="Sign up with Facebook"></i>
       </div>
 
       <p>
@@ -55,10 +55,10 @@
 
   <script>
     const phoneInput = document.querySelector("#phone");
-    window.intlTelInput(phoneInput, {
+    const iti = window.intlTelInput(phoneInput, {
       initialCountry: "auto",
       geoIpLookup: callback => {
-        fetch('https://ipinfo.io/json?token=YOUR_TOKEN') // Replace with your IPinfo token
+        fetch('https://ipinfo.io/json?token=YOUR_TOKEN') // Replace with your token
           .then(resp => resp.json())
           .then(resp => callback(resp.country))
           .catch(() => callback("us"));
@@ -78,7 +78,7 @@
       if (translations[lang]) {
         document.getElementById("form-title").innerText = translations[lang].title;
         document.getElementById("submit-button").innerText = translations[lang].submit;
-        document.getElementById("phone").placeholder = translations[lang].placeholderPhone;
+        phoneInput.placeholder = translations[lang].placeholderPhone;
         document.documentElement.lang = lang;
       }
     });
@@ -104,7 +104,7 @@
         surname: form.surname.value.trim(),
         username: form.username.value.trim(),
         email: form.email.value.trim(),
-        phone: form.phone.value.trim(),
+        phone: iti.getNumber(), // Get full international number
         password: form.password.value,
         language: form.language.value
       };
@@ -115,7 +115,7 @@
       }
 
       if (!isStrongPassword(data.password)) {
-        errorBox.textContent = "Password must be at least 8 characters, include uppercase, lowercase, number, and special character.";
+        errorBox.textContent = "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.";
         return;
       }
 
@@ -132,9 +132,10 @@
           alert("Signup successful! Redirecting...");
           window.location.href = "/login";
         } else {
-          errorBox.textContent = result.message || "Something went wrong!";
+          errorBox.textContent = result.message || "Signup failed. Please try again.";
         }
       } catch (err) {
+        console.error("Signup Error:", err);
         errorBox.textContent = "Server error. Please try again later.";
       }
     });

@@ -29,7 +29,7 @@ db.connect((err) => {
   console.log('✅ Connected to MySQL database');
 });
 
-// Serve HTML pages from public folder
+// Serve HTML pages
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'welcome.html'));
 });
@@ -45,7 +45,7 @@ app.get('/dashboard', (req, res) => {
 
 // Signup route
 app.post('/signup', async (req, res) => {
-  const { firstname, surname, phone, username, email, password, language } = req.body;
+  const { firstname, surname, phone_number, username, email, password, language } = req.body;
 
   try {
     const [existingUsers] = await db.promise().query(
@@ -60,9 +60,9 @@ app.post('/signup', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await db.promise().query(
-      `INSERT INTO users (firstname, surname, phone, username, email, password, language)
+      `INSERT INTO users (firstname, surname, phone_number, username, email, password, language)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [firstname, surname, phone, username, email, hashedPassword, language]
+      [firstname, surname, phone_number, username, email, hashedPassword, language]
     );
 
     res.status(200).json({ success: true, message: 'Signup successful!' });

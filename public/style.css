@@ -5,18 +5,19 @@
   box-sizing: border-box;
 }
 
-/* Background Image */
+/* Body with background image */
 body {
-  background-image: url('images/background.jpg'); /* No leading slash */
+  background-image: url('images/background.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #fff;
   min-height: 100vh;
+  line-height: 1.6;
 }
 
-/* Overlay to darken background */
+/* Dark overlay to enhance readability */
 .overlay {
   background-color: rgba(0, 0, 0, 0.6);
   min-height: 100vh;
@@ -75,6 +76,9 @@ body {
 .hero p {
   font-size: 1.2rem;
   margin-bottom: 30px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .cta {
@@ -94,7 +98,7 @@ body {
 /* Courses Section */
 .courses {
   padding: 60px 20px;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.95);
   border-radius: 16px;
   margin-top: 40px;
   text-align: center;
@@ -102,7 +106,7 @@ body {
 
 .courses h2 {
   font-size: 2rem;
-  color: #333;
+  color: #222;
   margin-bottom: 40px;
 }
 
@@ -118,6 +122,7 @@ body {
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease;
+  text-align: left;
 }
 
 .course-card:hover {
@@ -144,9 +149,9 @@ footer {
   color: #ccc;
 }
 
-/* Dashboard Background */
+/* Dashboard Page Background */
 body.dashboard-bg {
-  background-image: url('images/dashboard-bg.jpg'); /* No leading slash */
+  background-image: url('images/dashboard-bg.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

@@ -5,94 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Welcome to TRT Technology</title>
-  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f9f9f9;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 20px;
-      margin: 0;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-    }
-
-    p {
-      font-size: 1.2rem;
-      margin-bottom: 30px;
-    }
-
-    a {
-      color: #0066cc;
-      text-decoration: none;
-      margin: 0 12px;
-      font-weight: bold;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    #courses {
-      width: 100%;
-      max-width: 600px;
-      margin-top: 30px;
-    }
-
-    .course {
-      background: #fff;
-      padding: 15px 20px;
-      margin-bottom: 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      border-left: 5px solid #0066cc;
-    }
-
-    .course h3 {
-      margin: 0 0 8px;
-    }
-
-    .course p {
-      margin: 0 0 10px;
-      font-size: 0.95rem;
-    }
-
-    .apply-btn {
-      display: inline-block;
-      padding: 8px 16px;
-      background-color: #0066cc;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-weight: bold;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    .apply-btn:hover {
-      background-color: #0055aa;
-    }
-  </style>
+  <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <main>
-    <h1>Welcome to TRT Technology</h1>
-    <p>
-      <a href="/login">Login</a>
-      or
-      <a href="/signup">Sign Up</a>
-    </p>
+  <div class="overlay">
+    <div class="container">
+      <nav class="navbar">
+        <div class="logo">TRT Technology</div>
+        <ul class="nav-links">
+          <li><a href="/login">Login</a></li>
+          <li><a href="/signup">Sign Up</a></li>
+        </ul>
+      </nav>
 
-    <section id="courses">
-      <h2>Available Courses</h2>
-      <div id="course-list">Loading courses...</div>
-    </section>
-  </main>
+      <section class="hero">
+        <h1>Welcome to TRT Technology</h1>
+        <p>Your gateway to tech excellence.</p>
+      </section>
+
+      <section class="courses">
+        <h2>Available Courses</h2>
+        <div id="course-list">Loading courses...</div>
+      </section>
+    </div>
+  </div>
 
   <script>
     async function fetchCourses() {
@@ -103,14 +40,14 @@
         const courseList = document.getElementById('course-list');
         courseList.innerHTML = '';
 
-        if (courses.length === 0) {
+        if (!Array.isArray(courses) || courses.length === 0) {
           courseList.innerHTML = '<p>No courses available.</p>';
           return;
         }
 
         courses.forEach(course => {
           const div = document.createElement('div');
-          div.className = 'course';
+          div.className = 'course-card';
           div.innerHTML = `
             <h3>${course.title}</h3>
             <p>${course.description || 'No description available.'}</p>

@@ -5,18 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login | TRT Academy</title>
   <link rel="stylesheet" href="styles/login.css">
+  <style>
+    .error-message {
+      color: red;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .login-container a.forgot {
+      display: block;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 <body>
   <div class="overlay">
     <div class="login-container">
       <h1>Welcome Back</h1>
+
+      <!-- Error message (hidden by default) -->
+      <div id="error" class="error-message" style="display:none;"></div>
+
       <form action="/login" method="POST">
         <input type="email" name="email" placeholder="Email" required />
         <input type="password" name="password" placeholder="Password" required />
         <button type="submit">Login</button>
       </form>
+
+      <a href="#" class="forgot">Forgot Password?</a>
       <p>Don't have an account? <a href="signup.html">Sign up here</a>.</p>
     </div>
   </div>
+
+  <script>
+    // Show error messages from query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    if (error) {
+      const errorDiv = document.getElementById('error');
+      errorDiv.style.display = 'block';
+      if (error === 'invalid') {
+        errorDiv.textContent = '❌ Incorrect email or password.';
+      } else {
+        errorDiv.textContent = '⚠️ An unknown error occurred.';
+      }
+    }
+  </script>
 </body>
 </html>

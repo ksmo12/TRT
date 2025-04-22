@@ -5,113 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sign Up | TRT Academy</title>
   <link rel="stylesheet" href="styles/signup.css">
-  
+
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <!-- intl-tel-input CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.min.css"/>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: url('images/signup-bg.jpg') no-repeat center center/cover;
-    }
-
-    .overlay {
-      background-color: rgba(0, 0, 0, 0.6);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .signup-container {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      max-width: 400px;
-      width: 100%;
-    }
-
-    .signup-container h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #007bff;
-    }
-
-    form input,
-    form select,
-    form button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    form button {
-      background-color: #007bff;
-      color: white;
-      font-weight: bold;
-    }
-
-    .social-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 20px;
-    }
-
-    .social-buttons i {
-      font-size: 20px;
-      color: white;
-      width: 42px;
-      height: 42px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-    }
-
-    .fa-google { background-color: #db4437; }
-    .fa-apple { background-color: #000; }
-    .fa-facebook-f { background-color: #4267B2; }
-
-    .signup-container p {
-      text-align: center;
-    }
-
-    .login-link {
-      background: white;
-      color: #007bff;
-      text-align: center;
-      display: inline-block;
-      margin-top: 10px;
-      padding: 10px 16px;
-      border: 2px solid #007bff;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: bold;
-      transition: background 0.3s;
-    }
-
-    .login-link:hover {
-      background-color: #007bff;
-      color: white;
-    }
-
-    #error-message {
-      color: red;
-      text-align: center;
-      margin-top: -10px;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-  </style>
 </head>
 <body>
   <div class="overlay">
@@ -159,7 +58,7 @@
     window.intlTelInput(phoneInput, {
       initialCountry: "auto",
       geoIpLookup: callback => {
-        fetch('https://ipinfo.io/json?token=YOUR_TOKEN')
+        fetch('https://ipinfo.io/json?token=YOUR_TOKEN') // Replace with your IPinfo token
           .then(resp => resp.json())
           .then(resp => callback(resp.country))
           .catch(() => callback("us"));
@@ -220,31 +119,23 @@
         return;
       }
 
-      // Check if you're on Render (production)
-      const isRender = location.hostname.includes("onrender.com") || location.hostname.includes("yourdomain.com");
+      try {
+        const response = await fetch("/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
 
-      if (isRender) {
-        try {
-          const response = await fetch("/signup", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-          });
+        const result = await response.json();
 
-          const result = await response.json();
-
-          if (result.success) {
-            alert("Signup successful! Redirecting...");
-            window.location.href = "/login";
-          } else {
-            errorBox.textContent = result.message || "Something went wrong!";
-          }
-        } catch (err) {
-          errorBox.textContent = "Server error. Please try again later.";
+        if (result.success) {
+          alert("Signup successful! Redirecting...");
+          window.location.href = "/login";
+        } else {
+          errorBox.textContent = result.message || "Something went wrong!";
         }
-      } else {
-        // For GitHub Pages or local static preview
-        alert("Signup successful (demo only). Thank you!");
+      } catch (err) {
+        errorBox.textContent = "Server error. Please try again later.";
       }
     });
   </script>

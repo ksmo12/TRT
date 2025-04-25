@@ -7,7 +7,7 @@ async function sendTestEmail() {
   try {
     const data = await resend.emails.send({
       from: process.env.FROM_EMAIL,      // Must match your verified Resend domain email
-      to: 'your_email@gmail.com',        // Replace with the email you want to test with
+      to: 'busmeup13@gmail.com',        // Replace with the email you want to test with
       subject: '✅ Test Email from therealthespians.com',
       html: '<p>Hello! This is a test email from your site using Resend.</p>',
     });

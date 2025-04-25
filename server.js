@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const mysql = require('mysql2');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs'); // Correct the variable name
 const crypto = require('crypto');
 const { Resend } = require('resend');
 require('dotenv').config();
@@ -47,7 +47,7 @@ app.post('/signup', async (req, res) => {
     const [existing] = await db.promise().query('SELECT * FROM users WHERE email = ? OR username = ?', [email, username]);
     if (existing.length > 0) return res.status(409).json({ success: false, message: 'User already exists' });
 
-    const hashed = await bcrypt.hash(password, 10);
+    const hashed = await bcrypt.hash(password, 10); // bcryptjs hash
     const verificationToken = crypto.randomBytes(32).toString('hex');
 
     await db.promise().query(`

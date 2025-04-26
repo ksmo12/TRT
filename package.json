@@ -1,22 +1,21 @@
 {
   "name": "trt-website",
   "version": "1.0.0",
-  "description": "TRT Website - Node.js with MySQL, Express, JWT, Brevo API",
+  "description": "TRT Website - Node.js with MySQL, Express, Brevo API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "author": "Your Name",
   "license": "ISC",
-  "keywords": ["trt", "node", "express", "mysql", "brevo", "authentication", "email", "jwt"],
+  "keywords": ["trt", "node", "express", "mysql", "brevo", "authentication"],
   "dependencies": {
+    "@groupcards/brevo": "^1.0.7",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.5.0",
     "express": "^4.18.4",
-    "mysql2": "^3.4.0",
-    "jsonwebtoken": "^9.0.0",  // JWT package for token handling
-    "@groupcards/brevo": "^1.0.0",  // Brevo for email functionality
-    "cors": "^2.8.5"  // Optional: for CORS if needed
+    "jsonwebtoken": "^9.0.0",
+    "mysql2": "^3.4.0"
   },
   "engines": {
     "node": ">=18.0.0"

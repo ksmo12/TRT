@@ -2,40 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login | TRT Academy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | TRT Technology</title>
   <link rel="stylesheet" href="styles/login.css" />
 
   <style>
-    .error-message {
-      color: red;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-
-    .login-container a.forgot {
-      display: block;
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-    }
-
-    .login-container {
-      max-width: 400px;
-      margin: auto;
-      padding: 2rem;
-      background-color: #f9f9f9;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    .login-container input, .login-container button {
-      display: block;
-      width: 100%;
-      margin: 0.5rem 0;
-      padding: 0.75rem;
-      font-size: 1rem;
-    }
-
     body {
       font-family: Arial, sans-serif;
       background: #eef2f3;
@@ -45,39 +16,114 @@
       height: 100vh;
       margin: 0;
     }
+
+    .login-container {
+      width: 100%;
+      max-width: 400px;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .login-container h1 {
+      margin-bottom: 1.5rem;
+      color: #007BFF;
+    }
+
+    .error-message {
+      color: red;
+      margin-bottom: 1rem;
+      display: none;
+      font-size: 0.95rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 0.75rem;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .login-container a {
+      display: block;
+      margin-top: 1rem;
+      color: #007BFF;
+      text-decoration: underline;
+      font-size: 0.95rem;
+    }
+
+    .login-container p {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .login-container p a {
+      color: #007BFF;
+      font-weight: bold;
+      text-decoration: underline;
+    }
   </style>
 </head>
+
 <body>
   <div class="login-container">
     <h1>Welcome Back</h1>
 
-    <!-- Error message (hidden by default) -->
-    <div id="error" class="error-message" style="display:none;"></div>
+    <!-- Error message -->
+    <div id="error" class="error-message"></div>
 
-    <form action="/login" method="POST">
+    <form action="/login" method="POST" id="loginForm">
       <input type="email" name="email" placeholder="Email" required />
       <input type="password" name="password" placeholder="Password" required />
       <button type="submit">Login</button>
     </form>
 
-    <a href="forgot-password.html" class="forgot">Forgot Password?</a>
-    <p>Don't have an account? <a href="signup.html">Sign up here</a>.</p>
+    <a href="/forgotpassword" class="forgot">Forgot Password?</a>
+
+    <p>Don't have an account? <a href="/signup">Sign up here</a>.</p>
   </div>
 
   <script>
-    // Show error messages from query parameter
+    // Check for error messages in the URL query params
     const urlParams = new URLSearchParams(window.location.search);
     const error = urlParams.get('error');
     const errorDiv = document.getElementById('error');
 
     if (error) {
       errorDiv.style.display = 'block';
-      if (error === 'invalid') {
-        errorDiv.textContent = '❌ Incorrect email or password.';
-      } else if (error === 'unverified') {
-        errorDiv.textContent = '⚠️ Please verify your email before logging in.';
-      } else {
-        errorDiv.textContent = '⚠️ Incorrect information.';
+      switch (error) {
+        case 'invalid':
+          errorDiv.textContent = '❌ Incorrect email or password.';
+          break;
+        case 'unverified':
+          errorDiv.textContent = '⚠️ Please verify your email before logging in.';
+          break;
+        default:
+          errorDiv.textContent = '⚠️ Something went wrong. Please try again.';
       }
     }
   </script>

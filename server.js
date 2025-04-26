@@ -3,12 +3,12 @@ const path = require('path');
 const mysql = require('mysql2');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const { Resend } = require('resend');
+const { default: Brevo } = require('@getbrevo/brevo'); // Updated for Brevo
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const resend = new Resend(process.env.RESEND_API_KEY);
+const brevo = new Brevo(process.env.BREVO_API_KEY);
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -32,13 +32,13 @@ db.connect((err) => {
   console.log('✅ Connected to MySQL database');
 });
 
-// Public routes
+// Public Routes
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'welcome.html')));
 app.get('/signup', (req, res) => res.sendFile(path.join(__dirname, 'public', 'signup.html')));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
 app.get('/forgot-password', (req, res) => res.sendFile(path.join(__dirname, 'public', 'forgot-password.html')));
-app.get('/reset-password', (req, res) => res.sendFile(path.join(__dirname, 'public', 'reset-password.html')));
+app.get('/resetcode', (req, res) => res.sendFile(path.join(__dirname, 'public', 'resetcode.html')));
 
 // Signup
 app.post('/signup', async (req, res) => {
@@ -46,7 +46,7 @@ app.post('/signup', async (req, res) => {
   try {
     const [existing] = await db.promise().query('SELECT * FROM users WHERE email = ? OR username = ?', [email, username]);
     if (existing.length > 0) {
-      return res.status(409).json({ success: false, message: 'User already exists' });
+      return res.status(409).json({ success: false, message: 'User already exists.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -57,11 +57,16 @@ app.post('/signup', async (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `, [firstname, surname, phone_number, username, email, hashedPassword, language, verificationToken]);
 
-    await resend.emails.send({
-      from: process.env.FROM_EMAIL,
-      to: email,
-      subject: 'Verify Your Email',
-      html: `<p>Click below to verify your email:</p><a href="${process.env.DOMAIN}/verify-email?token=${verificationToken}">Verify Email</a>`,
+    // Send Welcome + Verification email
+    await brevo.emails.send({
+      from: { email: process.env.FROM_EMAIL },
+      to: [{ email }],
+      subject: 'Welcome to TRT Technology - Verify Your Email',
+      htmlContent: `
+        <h1>Welcome to TRT Technology!</h1>
+        <p>Thank you for signing up. Please verify your email by clicking the link below:</p>
+        <a href="${process.env.DOMAIN}/verify-email?token=${verificationToken}">Verify Email</a>
+      `,
     });
 
     res.status(200).json({ success: true, message: 'Signup successful! Verification email sent.' });
@@ -71,17 +76,17 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-// Email Verification
+// Verify Email
 app.get('/verify-email', async (req, res) => {
   const { token } = req.query;
   try {
     const [users] = await db.promise().query('SELECT * FROM users WHERE verification_token = ?', [token]);
-    if (users.length === 0) return res.send('Invalid or expired verification token.');
+    if (users.length === 0) return res.send('Invalid or expired verification link.');
 
     await db.promise().query('UPDATE users SET verification_token = NULL, is_verified = 1 WHERE verification_token = ?', [token]);
-    res.send('✅ Email verified successfully. You can now log in.');
+    res.send('✅ Email verified successfully. You can now login.');
   } catch (err) {
-    console.error('❌ Email verification error:', err);
+    console.error('❌ Verify email error:', err);
     res.status(500).send('Server error.');
   }
 });
@@ -105,67 +110,72 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Forgot Password
+// Forgot Password - Send Reset Code
 app.post('/forgot-password', async (req, res) => {
   const { email } = req.body;
   try {
-    const token = crypto.randomBytes(32).toString('hex');
-    const [user] = await db.promise().query('SELECT * FROM users WHERE email = ?', [email]);
-    if (user.length === 0) return res.status(400).json({ success: false, message: 'No user found with that email.' });
+    const [users] = await db.promise().query('SELECT * FROM users WHERE email = ?', [email]);
+    if (users.length === 0) return res.status(400).json({ success: false, message: 'No user with that email.' });
 
-    await db.promise().query('UPDATE users SET reset_token = ?, reset_token_expiry = DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE email = ?', [token, email]);
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit code
+    const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-    await resend.emails.send({
-      from: process.env.FROM_EMAIL,
-      to: email,
-      subject: 'Password Reset',
-      html: `<p>Click below to reset your password:</p><a href="${process.env.DOMAIN}/reset-password?token=${token}">Reset Password</a>`,
+    await db.promise().query('UPDATE users SET reset_code = ?, reset_code_expiry = ? WHERE email = ?', [resetCode, expiry, email]);
+
+    await brevo.emails.send({
+      from: { email: process.env.FROM_EMAIL },
+      to: [{ email }],
+      subject: 'Your Password Reset Code',
+      htmlContent: `<p>Your password reset code is: <strong>${resetCode}</strong><br>This code will expire in 1 hour.</p>`,
     });
 
-    res.json({ success: true, message: 'Password reset email sent.' });
+    res.json({ success: true, message: 'Reset code sent to your email.' });
   } catch (err) {
     console.error('❌ Forgot password error:', err);
     res.status(500).json({ success: false, message: 'Server error.' });
   }
 });
 
-// Reset Password (final step)
-app.post('/reset-password', async (req, res) => {
-  const { token, password } = req.body;
+// Reset Password (with Code)
+app.post('/resetcode', async (req, res) => {
+  const { email, reset_code, new_password } = req.body;
   try {
-    const [users] = await db.promise().query('SELECT * FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()', [token]);
+    const [users] = await db.promise().query('SELECT * FROM users WHERE email = ? AND reset_code = ? AND reset_code_expiry > NOW()', [email, reset_code]);
     if (users.length === 0) {
-      return res.status(400).json({ success: false, message: 'Invalid or expired reset token.' });
+      return res.status(400).json({ success: false, message: 'Invalid or expired reset code.' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(new_password, 10);
 
-    await db.promise().query('UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE reset_token = ?', [hashedPassword, token]);
+    await db.promise().query(`
+      UPDATE users SET password = ?, reset_code = NULL, reset_code_expiry = NULL
+      WHERE email = ?
+    `, [hashedPassword, email]);
 
     res.json({ success: true, message: '✅ Password reset successful. You can now log in!' });
   } catch (err) {
-    console.error('❌ Reset password error:', err);
+    console.error('❌ Reset code error:', err);
     res.status(500).json({ success: false, message: 'Server error.' });
   }
 });
 
-// Get all courses
+// Get all Courses
 app.get('/api/courses', async (req, res) => {
   try {
     const [courses] = await db.promise().query('SELECT * FROM courses');
     res.json(courses);
   } catch (err) {
-    console.error('❌ Courses fetch error:', err);
+    console.error('❌ Fetch courses error:', err);
     res.status(500).send('Server error.');
   }
 });
 
-// 404 handler
+// 404 Handler
 app.use((req, res) => {
   res.status(404).send('404 - Page not found.');
 });
 
-// Start the server
+// Start Server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

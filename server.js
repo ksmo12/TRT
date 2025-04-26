@@ -3,12 +3,18 @@ const path = require('path');
 const mysql = require('mysql2');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const { default: Brevo } = require('@getbrevo/brevo'); // Updated for Brevo
+const SibApiV3Sdk = require('sib-api-v3-sdk'); // Correct Brevo package
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const brevo = new Brevo(process.env.BREVO_API_KEY);
+
+// Configure Brevo (sib-api-v3-sdk)
+let defaultClient = SibApiV3Sdk.ApiClient.instance;
+let apiKey = defaultClient.authentications['api-key'];
+apiKey.apiKey = process.env.BREVO_API_KEY;
+
+const brevo = new SibApiV3Sdk.TransactionalEmailsApi();
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -58,8 +64,8 @@ app.post('/signup', async (req, res) => {
     `, [firstname, surname, phone_number, username, email, hashedPassword, language, verificationToken]);
 
     // Send Welcome + Verification email
-    await brevo.emails.send({
-      from: { email: process.env.FROM_EMAIL },
+    await brevo.sendTransacEmail({
+      sender: { email: process.env.FROM_EMAIL, name: "TRT Academy" },
       to: [{ email }],
       subject: 'Welcome to TRT Technology - Verify Your Email',
       htmlContent: `
@@ -122,8 +128,8 @@ app.post('/forgot-password', async (req, res) => {
 
     await db.promise().query('UPDATE users SET reset_code = ?, reset_code_expiry = ? WHERE email = ?', [resetCode, expiry, email]);
 
-    await brevo.emails.send({
-      from: { email: process.env.FROM_EMAIL },
+    await brevo.sendTransacEmail({
+      sender: { email: process.env.FROM_EMAIL, name: "TRT Academy" },
       to: [{ email }],
       subject: 'Your Password Reset Code',
       htmlContent: `<p>Your password reset code is: <strong>${resetCode}</strong><br>This code will expire in 1 hour.</p>`,

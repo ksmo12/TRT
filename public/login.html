@@ -4,50 +4,80 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login | TRT Academy</title>
-  <link rel="stylesheet" href="styles/login.css">
+  <link rel="stylesheet" href="styles/login.css" />
+
   <style>
     .error-message {
       color: red;
       margin-bottom: 1rem;
       text-align: center;
     }
+
     .login-container a.forgot {
       display: block;
       margin-top: 0.5rem;
       font-size: 0.9rem;
     }
+
+    .login-container {
+      max-width: 400px;
+      margin: auto;
+      padding: 2rem;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .login-container input, .login-container button {
+      display: block;
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      font-size: 1rem;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
   </style>
 </head>
 <body>
-  <div class="overlay">
-    <div class="login-container">
-      <h1>Welcome Back</h1>
+  <div class="login-container">
+    <h1>Welcome Back</h1>
 
-      <!-- Error message (hidden by default) -->
-      <div id="error" class="error-message" style="display:none;"></div>
+    <!-- Error message (hidden by default) -->
+    <div id="error" class="error-message" style="display:none;"></div>
 
-      <form action="/login" method="POST">
-        <input type="email" name="email" placeholder="Email" required />
-        <input type="password" name="password" placeholder="Password" required />
-        <button type="submit">Login</button>
-      </form>
+    <form action="/login" method="POST">
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
 
-      <a href="#" class="forgot">Forgot Password?</a>
-      <p>Don't have an account? <a href="signup.html">Sign up here</a>.</p>
-    </div>
+    <a href="forgot-password.html" class="forgot">Forgot Password?</a>
+    <p>Don't have an account? <a href="signup.html">Sign up here</a>.</p>
   </div>
 
   <script>
     // Show error messages from query parameter
     const urlParams = new URLSearchParams(window.location.search);
     const error = urlParams.get('error');
+    const errorDiv = document.getElementById('error');
+
     if (error) {
-      const errorDiv = document.getElementById('error');
       errorDiv.style.display = 'block';
       if (error === 'invalid') {
         errorDiv.textContent = '❌ Incorrect email or password.';
+      } else if (error === 'unverified') {
+        errorDiv.textContent = '⚠️ Please verify your email before logging in.';
       } else {
-        errorDiv.textContent = '⚠️ An unknown error occurred.';
+        errorDiv.textContent = '⚠️ Incorrect information.';
       }
     }
   </script>

@@ -3,7 +3,7 @@ const path = require('path');
 const mysql = require('mysql2');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const { default: Brevo } = require('@groupcards/brevo'); // Updated for Brevo
+const { default: Brevo } = require('@getbrevo/brevo'); // Updated for Brevo
 require('dotenv').config();
 
 const app = express();

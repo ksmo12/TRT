@@ -3,20 +3,21 @@ const path = require('path');
 const mysql = require('mysql2');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const SibApiV3Sdk = require('sib-api-v3-sdk'); // Correct Brevo package
+const SibApiV3Sdk = require('sib-api-v3-sdk');
+const helmet = require('helmet'); // Extra security
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configure Brevo (sib-api-v3-sdk)
+// Configure Brevo (SIB API)
 let defaultClient = SibApiV3Sdk.ApiClient.instance;
 let apiKey = defaultClient.authentications['api-key'];
 apiKey.apiKey = process.env.BREVO_API_KEY;
-
 const brevo = new SibApiV3Sdk.TransactionalEmailsApi();
 
 // Middleware
+app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -48,7 +49,7 @@ app.get('/resetcode', (req, res) => res.sendFile(path.join(__dirname, 'public', 
 
 // Signup
 app.post('/signup', async (req, res) => {
-  const { firstname, surname, phone_number, username, email, password, language } = req.body;
+  const { firstname, surname, phone, username, email, password, language } = req.body; // ✅ Corrected field: phone
   try {
     const [existing] = await db.promise().query('SELECT * FROM users WHERE email = ? OR username = ?', [email, username]);
     if (existing.length > 0) {
@@ -61,16 +62,16 @@ app.post('/signup', async (req, res) => {
     await db.promise().query(`
       INSERT INTO users (firstname, surname, phone_number, username, email, password, language, verification_token)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `, [firstname, surname, phone_number, username, email, hashedPassword, language, verificationToken]);
+    `, [firstname, surname, phone, username, email, hashedPassword, language, verificationToken]);
 
-    // Send Welcome + Verification email
+    // Send Welcome + Verification Email
     await brevo.sendTransacEmail({
       sender: { email: process.env.FROM_EMAIL, name: "TRT Academy" },
       to: [{ email }],
       subject: 'Welcome to TRT Technology - Verify Your Email',
       htmlContent: `
         <h1>Welcome to TRT Technology!</h1>
-        <p>Thank you for signing up. Please verify your email by clicking the link below:</p>
+        <p>Thank you for signing up. Please verify your email by clicking below:</p>
         <a href="${process.env.DOMAIN}/verify-email?token=${verificationToken}">Verify Email</a>
       `,
     });
@@ -123,7 +124,7 @@ app.post('/forgot-password', async (req, res) => {
     const [users] = await db.promise().query('SELECT * FROM users WHERE email = ?', [email]);
     if (users.length === 0) return res.status(400).json({ success: false, message: 'No user with that email.' });
 
-    const resetCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit code
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
     await db.promise().query('UPDATE users SET reset_code = ?, reset_code_expiry = ? WHERE email = ?', [resetCode, expiry, email]);
@@ -178,7 +179,7 @@ app.get('/api/courses', async (req, res) => {
 
 // 404 Handler
 app.use((req, res) => {
-  res.status(404).send('404 - Page not found.');
+  res.status(404).type('html').send('<h1>404 - Page Not Found</h1>');
 });
 
 // Start Server

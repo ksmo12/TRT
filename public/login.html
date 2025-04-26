@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login | TRT Technology</title>
   <link rel="stylesheet" href="styles/login.css" />
-
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -35,8 +34,8 @@
     .error-message {
       color: red;
       margin-bottom: 1rem;
-      display: none;
       font-size: 0.95rem;
+      display: none;
     }
 
     form {
@@ -93,7 +92,6 @@
   <div class="login-container">
     <h1>Welcome Back</h1>
 
-    <!-- Error message -->
     <div id="error" class="error-message"></div>
 
     <form action="/login" method="POST" id="loginForm">
@@ -108,7 +106,6 @@
   </div>
 
   <script>
-    // Check for error messages in the URL query params
     const urlParams = new URLSearchParams(window.location.search);
     const error = urlParams.get('error');
     const errorDiv = document.getElementById('error');

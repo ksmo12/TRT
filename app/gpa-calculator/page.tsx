@@ -385,9 +385,9 @@ export default function GPACalculator() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
               <div>
-                <h4 className="font-semibold mb-2">🔢 Pure JavaScript</h4>
+                <h4 className="font-semibold mb-2">🔢 Pure friendly use</h4>
                 <p className="text-gray-600">
-                  All calculations happen in your browser using JavaScript. No server calls, no database - instant
+                  All calculations happen in your browser. No information or login required - instant
                   results!
                 </p>
               </div>

@@ -529,7 +529,7 @@ export default function LandingPage() {
 
           <div className="border-t border-gray-800 mt-6 md:mt-8 pt-6 md:pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center">
-              <p className="text-gray-400 text-sm">© 2024 SmartGPA.ng. Made with 💚 for Nigerian students.</p>
+              <p className="text-gray-400 text-sm">© 2025 SmartGPA.ng. Made with 💚 for Nigerian students.</p>
               <p className="text-gray-400 text-sm mt-2 md:mt-0">
                 Created by{" "}
                 <a href="/creator" className="text-green-400 hover:text-green-300">

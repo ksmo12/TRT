@@ -533,7 +533,7 @@ export default function LandingPage() {
               <p className="text-gray-400 text-sm mt-2 md:mt-0">
                 Created by{" "}
                 <a href="/creator" className="text-green-400 hover:text-green-300">
-                  AYOMIDE OLAMILEKAN "KSMO"
+                  Ayomide Olamilekan & Obilonu Nelson
                 </a>
               </p>
             </div>
